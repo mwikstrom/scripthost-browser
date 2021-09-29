@@ -5,6 +5,8 @@
 ```ts
 
 import { ScriptHostBridge } from 'scripthost';
+import { ScriptHostInputMessage } from 'scripthost';
+import { ScriptHostOutputMessage } from 'scripthost';
 
 // @public
 export class BrowserScriptHostBridge implements ScriptHostBridge {
@@ -12,9 +14,9 @@ export class BrowserScriptHostBridge implements ScriptHostBridge {
     // (undocumented)
     dispose(): void;
     // (undocumented)
-    listen(): () => void;
+    listen(handler: (message: ScriptHostOutputMessage) => void): () => void;
     // (undocumented)
-    post(): void;
+    post(message: ScriptHostInputMessage): void;
 }
 
 ```

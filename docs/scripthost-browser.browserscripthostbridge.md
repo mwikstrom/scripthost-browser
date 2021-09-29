@@ -24,6 +24,6 @@ export declare class BrowserScriptHostBridge implements ScriptHostBridge
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
 |  [dispose()](./scripthost-browser.browserscripthostbridge.dispose.md) |  |  |
-|  [listen()](./scripthost-browser.browserscripthostbridge.listen.md) |  |  |
-|  [post()](./scripthost-browser.browserscripthostbridge.post.md) |  |  |
+|  [listen(handler)](./scripthost-browser.browserscripthostbridge.listen.md) |  |  |
+|  [post(message)](./scripthost-browser.browserscripthostbridge.post.md) |  |  |
 

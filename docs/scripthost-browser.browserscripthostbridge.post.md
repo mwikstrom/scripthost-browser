@@ -7,8 +7,15 @@
 <b>Signature:</b>
 
 ```typescript
-post(): void;
+post(message: ScriptHostInputMessage): void;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  message | ScriptHostInputMessage |  |
+
 <b>Returns:</b>
 
 void

@@ -1,4 +1,4 @@
-import { ScriptHostBridge } from "scripthost";
+import { ScriptHostBridge, ScriptHostInputMessage, ScriptHostOutputMessage } from "scripthost";
 import IFRAME_CODE from "scripthost-iframe/dist/scripthost-iframe.js";
 
 /**
@@ -6,22 +6,41 @@ import IFRAME_CODE from "scripthost-iframe/dist/scripthost-iframe.js";
  * @public
  */
 export class BrowserScriptHostBridge implements ScriptHostBridge {
+    private readonly _global: typeof window;
+    private readonly _iframe: HTMLIFrameElement;
+
     constructor(global = window) {
         const iframe = global.document.createElement("iframe");
+        iframe.style.display = "none";
         iframe.sandbox.add("allow-scripts");
         iframe.srcdoc = `<html><head><script>${IFRAME_CODE};scripthostIFrame.setupIFrame();</script></head></html>`;
         global.document.body.appendChild(iframe);
+        this._global = window;
+        this._iframe = iframe;
     }
 
     dispose(): void {
-        throw new Error("Method not implemented.");
+        this._iframe.remove();
     }
 
-    post(): void {
-        throw new Error("Method not implemented.");
+    post(message: ScriptHostInputMessage): void {
+        const { contentWindow } = this._iframe;
+        if (contentWindow) {
+            contentWindow.postMessage(message, "*");
+        }
     }
     
-    listen(): () => void {
-        throw new Error("Method not implemented.");
+    listen(handler: (message: ScriptHostOutputMessage) => void): () => void {
+        const listener = (e: MessageEvent): void => {
+            const { origin, source, data } = e;
+            const { contentWindow } = this._iframe;
+            if (origin === "null" && !!source && source === contentWindow) {
+                handler(data);
+            }
+        };
+        this._global.addEventListener("message", listener);
+        return () => {
+            this._global.removeEventListener("message", listener);
+        };
     }
 }

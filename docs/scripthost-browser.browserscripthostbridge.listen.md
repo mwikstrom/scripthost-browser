@@ -7,8 +7,15 @@
 <b>Signature:</b>
 
 ```typescript
-listen(): () => void;
+listen(handler: (message: ScriptHostOutputMessage) => void): () => void;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  handler | (message: ScriptHostOutputMessage) =&gt; void |  |
+
 <b>Returns:</b>
 
 () =&gt; void
