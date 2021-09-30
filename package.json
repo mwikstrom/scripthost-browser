@@ -67,8 +67,8 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.56.3",
     "rollup-plugin-string": "^3.0.0",
-    "scripthost": "0.0.1",
-    "scripthost-iframe": "0.0.1",
+    "scripthost-core": "^0.2.4",
+    "scripthost-iframe": "^0.2.3",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.1.0",
     "tslib": "^2.3.0",
@@ -76,6 +76,6 @@
     "webpack": "^5.55.0"
   },
   "peerDependencies": {
-    "scripthost": "0.x"
+    "scripthost-core": "0.x"
   }
 }

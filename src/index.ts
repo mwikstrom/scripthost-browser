@@ -3,4 +3,4 @@
  * @packageDocumentation
  */
 
-export * from "./BrowserScriptHostBridge";
+export * from "./BrowserSandbox";

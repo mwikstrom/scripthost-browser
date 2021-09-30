@@ -1,13 +1,14 @@
-import { ScriptHostBridge, ScriptHostInputMessage, ScriptHostOutputMessage } from "scripthost";
+import { ScriptSandbox, ScriptValue } from "scripthost-core";
 import IFRAME_CODE from "scripthost-iframe/dist/scripthost-iframe.js";
 
 /**
  * A script host brigde that runs code inside an IFRAME element
  * @public
  */
-export class BrowserScriptHostBridge implements ScriptHostBridge {
+export class BrowserSandbox implements ScriptSandbox {
     private readonly _global: typeof window;
     private readonly _iframe: HTMLIFrameElement;
+    private readonly _ready: Promise<void>;
 
     constructor(global = window) {
         const iframe = global.document.createElement("iframe");
@@ -17,20 +18,27 @@ export class BrowserScriptHostBridge implements ScriptHostBridge {
         global.document.body.appendChild(iframe);
         this._global = window;
         this._iframe = iframe;
+        this._ready = new Promise(resolve => {
+            iframe.addEventListener("load", () => {
+                resolve();
+            });
+        });
     }
 
     dispose(): void {
         this._iframe.remove();
     }
 
-    post(message: ScriptHostInputMessage): void {
-        const { contentWindow } = this._iframe;
-        if (contentWindow) {
-            contentWindow.postMessage(message, "*");
-        }
+    post(message: ScriptValue): void {
+        this._ready.then(() => {
+            const { contentWindow } = this._iframe;
+            if (contentWindow) {
+                contentWindow.postMessage(message, "*");
+            }
+        });
     }
     
-    listen(handler: (message: ScriptHostOutputMessage) => void): () => void {
+    listen(handler: (message: ScriptValue) => void): () => void {
         const listener = (e: MessageEvent): void => {
             const { origin, source, data } = e;
             const { contentWindow } = this._iframe;
