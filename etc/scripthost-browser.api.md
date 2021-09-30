@@ -4,19 +4,18 @@
 
 ```ts
 
-import { ScriptHostBridge } from 'scripthost';
-import { ScriptHostInputMessage } from 'scripthost';
-import { ScriptHostOutputMessage } from 'scripthost';
+import { ScriptSandbox } from 'scripthost-core';
+import { ScriptValue } from 'scripthost-core';
 
 // @public
-export class BrowserScriptHostBridge implements ScriptHostBridge {
+export class BrowserSandbox implements ScriptSandbox {
     constructor(global?: Window & typeof globalThis);
     // (undocumented)
     dispose(): void;
     // (undocumented)
-    listen(handler: (message: ScriptHostOutputMessage) => void): () => void;
+    listen(handler: (message: ScriptValue) => void): () => void;
     // (undocumented)
-    post(message: ScriptHostInputMessage): void;
+    post(message: ScriptValue): void;
 }
 
 ```

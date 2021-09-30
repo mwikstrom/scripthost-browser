@@ -10,5 +10,5 @@ Sandboxed and observable Javascript host that runs inside an iframe element
 
 |  Class | Description |
 |  --- | --- |
-|  [BrowserScriptHostBridge](./scripthost-browser.browserscripthostbridge.md) | A script host brigde that runs code inside an IFRAME element |
+|  [BrowserSandbox](./scripthost-browser.browsersandbox.md) | A script host brigde that runs code inside an IFRAME element |
 
