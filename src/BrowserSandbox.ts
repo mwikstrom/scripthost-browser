@@ -6,12 +6,73 @@ import IFRAME_CODE from "scripthost-iframe/dist/scripthost-iframe.js";
  * @public
  */
 export class BrowserSandbox implements ScriptSandbox {
-    private readonly _global: typeof window;
-    private readonly _iframe: HTMLIFrameElement;
-    private readonly _ready: Promise<void>;
+    private _iframePromise: Promise<HTMLIFrameElement> | null;
 
-    constructor(global = window) {
-        const iframe = global.document.createElement("iframe");
+    constructor() {
+        this._iframePromise = null;
+    }
+
+    dispose(): void {
+        if (this._iframePromise !== null) {
+            this._iframePromise.then(iframe => iframe.remove());
+        }
+        this._iframePromise = null;
+    }
+
+    post(message: ScriptValue): void {
+        this._getIFrame().then(
+            ({contentWindow}) => {
+                if (contentWindow) {
+                    contentWindow.postMessage(message, "*");
+                } else {
+                    console.error("Cannot post message to browser sandbox, because it does not have a content window");
+                }
+            },
+            error => console.error("Browser sandbox is not available:", error),
+        );
+    }
+    
+    listen(handler: (message: ScriptValue) => void): () => void {
+        let active = true;
+        let listener: ((e: MessageEvent) => void) | null = null;
+        this._getIFrame().then(
+            ({contentWindow}) => active && window.addEventListener("message", listener = (e: MessageEvent): void => {
+                const { origin, source, data } = e;
+                if (origin !== "null") {
+                    console.warn(`Browser sandbox: Rejecting message with invalid origin: ${origin}`);
+                } else if (!source) {
+                    console.warn("Browser sandbox: Rejecting message without source");
+                } else if (source !== contentWindow) {
+                    console.warn("Browser sandbox: Rejecting message with invalid source");
+                } else {
+                    try {
+                        handler(data);
+                    } catch (error) {
+                        console.error("Browser sandbox: Listener threw exception:", error);
+                    }
+                }
+            }),
+            error => console.error("Browser sandbox is not available:", error),
+        );
+        return () => {
+            active = false;
+            if (listener !== null) {
+                window.removeEventListener("message", listener);
+            }
+        };
+    }
+
+    private _getIFrame(): Promise<HTMLIFrameElement> {
+        if (this._iframePromise === null) {
+            this._iframePromise = setupIFrame();
+        }
+        return this._iframePromise;
+    }
+}
+
+const setupIFrame = (): Promise<HTMLIFrameElement> => new Promise((resolve, reject) => {
+    try {
+        const iframe = document.createElement("iframe");
         iframe.style.display = "none";
         iframe.sandbox.add("allow-scripts");
         iframe.srcdoc = `
@@ -21,40 +82,16 @@ export class BrowserSandbox implements ScriptSandbox {
             scripthostIFrame.setupIFrame();\n
             </script></head></html>
         `;
-        global.document.body.appendChild(iframe);
-        this._global = window;
-        this._iframe = iframe;
-        this._ready = new Promise(resolve => {
-            iframe.addEventListener("load", () => {
-                resolve();
-            });
+        document.body.appendChild(iframe);
+        const timeoutId = setTimeout(
+            () => reject(new Error("Browser sandbox IFRAME element did not load")),
+            3000
+        );
+        iframe.addEventListener("load", () => {
+            clearTimeout(timeoutId);
+            resolve(iframe);
         });
+    } catch (err) {
+        reject(err);
     }
-
-    dispose(): void {
-        this._iframe.remove();
-    }
-
-    post(message: ScriptValue): void {
-        this._ready.then(() => {
-            const { contentWindow } = this._iframe;
-            if (contentWindow) {
-                contentWindow.postMessage(message, "*");
-            }
-        });
-    }
-    
-    listen(handler: (message: ScriptValue) => void): () => void {
-        const listener = (e: MessageEvent): void => {
-            const { origin, source, data } = e;
-            const { contentWindow } = this._iframe;
-            if (origin === "null" && !!source && source === contentWindow) {
-                handler(data);
-            }
-        };
-        this._global.addEventListener("message", listener);
-        return () => {
-            this._global.removeEventListener("message", listener);
-        };
-    }
-}
+});
