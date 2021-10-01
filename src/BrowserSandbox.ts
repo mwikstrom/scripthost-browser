@@ -90,7 +90,6 @@ const setupIFrame = (): Promise<HTMLIFrameElement> => new Promise((resolve, reje
         iframe.sandbox.add("allow-scripts");
         iframe.srcdoc = `
             <html><head><script>\n
-            debugger; // Giving you a chance to set breakpoints in this code\n
             ${IFRAME_CODE}\n
             scripthostIFrame.setupIFrame();\n
             </script></head></html>
