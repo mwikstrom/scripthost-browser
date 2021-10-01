@@ -14,7 +14,13 @@ export class BrowserSandbox implements ScriptSandbox {
         const iframe = global.document.createElement("iframe");
         iframe.style.display = "none";
         iframe.sandbox.add("allow-scripts");
-        iframe.srcdoc = `<html><head><script>${IFRAME_CODE};scripthostIFrame.setupIFrame();</script></head></html>`;
+        iframe.srcdoc = `
+            <html><head><script>\n
+            debugger; // Giving you a chance to set breakpoints in this code\n
+            ${IFRAME_CODE}\n
+            scripthostIFrame.setupIFrame();\n
+            </script></head></html>
+        `;
         global.document.body.appendChild(iframe);
         this._global = window;
         this._iframe = iframe;
