@@ -9,13 +9,15 @@ import { ScriptValue } from 'scripthost-core';
 
 // @public
 export class BrowserSandbox implements ScriptSandbox {
-    constructor(global?: Window & typeof globalThis);
+    constructor();
     // (undocumented)
-    dispose(): void;
+    dispose(): Promise<void>;
     // (undocumented)
     listen(handler: (message: ScriptValue) => void): () => void;
     // (undocumented)
     post(message: ScriptValue): void;
+    // (undocumented)
+    ready(): Promise<void>;
 }
 
 ```

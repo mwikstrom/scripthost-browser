@@ -7,9 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-dispose(): void;
+dispose(): Promise<void>;
 ```
 <b>Returns:</b>
 
-void
+Promise&lt;void&gt;
 

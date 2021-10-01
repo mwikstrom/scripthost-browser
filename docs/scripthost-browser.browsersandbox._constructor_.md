@@ -9,12 +9,5 @@ Constructs a new instance of the `BrowserSandbox` class
 <b>Signature:</b>
 
 ```typescript
-constructor(global?: Window & typeof globalThis);
+constructor();
 ```
-
-## Parameters
-
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  global | Window &amp; typeof globalThis |  |
-
