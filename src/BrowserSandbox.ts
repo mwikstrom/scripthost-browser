@@ -7,16 +7,23 @@ import IFRAME_CODE from "scripthost-iframe/dist/scripthost-iframe.js";
  */
 export class BrowserSandbox implements ScriptSandbox {
     private _iframePromise: Promise<HTMLIFrameElement> | null;
+    private _disposed;
 
     constructor() {
         this._iframePromise = null;
+        this._disposed = false;
     }
 
-    dispose(): void {
+    async ready(): Promise<void> {
+        await this._getIFrame();
+    }
+
+    async dispose(): Promise<void> {
         if (this._iframePromise !== null) {
-            this._iframePromise.then(iframe => iframe.remove());
+            (await this._iframePromise).remove();
         }
         this._iframePromise = null;
+        this._disposed = true;
     }
 
     post(message: ScriptValue): void {
@@ -64,7 +71,13 @@ export class BrowserSandbox implements ScriptSandbox {
 
     private _getIFrame(): Promise<HTMLIFrameElement> {
         if (this._iframePromise === null) {
-            this._iframePromise = setupIFrame();
+            if (this._disposed) {
+                this._iframePromise = new Promise<HTMLIFrameElement>((_, reject) => reject(new Error(
+                    "Browser sandbox is disposed"
+                )));
+            } else {
+                this._iframePromise = setupIFrame();
+            }
         }
         return this._iframePromise;
     }
