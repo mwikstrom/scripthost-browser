@@ -1,15 +1,18 @@
 import { ScriptSandbox, ScriptValue } from "scripthost-core";
-import IFRAME_CODE from "scripthost-iframe/dist/scripthost-iframe.js";
+import IFRAME_LIB from "scripthost-iframe/dist/scripthost-iframe.js";
 
 /**
  * A script host brigde that runs code inside an IFRAME element
  * @public
  */
 export class BrowserSandbox implements ScriptSandbox {
+    private readonly _unsafe: boolean;
     private _iframePromise: Promise<HTMLIFrameElement> | null;
     private _disposed;
 
-    constructor() {
+    constructor(options: BrowserSandboxOptions = {}) {
+        const { unsafe = false } = options;
+        this._unsafe = unsafe;
         this._iframePromise = null;
         this._disposed = false;
     }
@@ -76,25 +79,44 @@ export class BrowserSandbox implements ScriptSandbox {
                     "Browser sandbox is disposed"
                 )));
             } else {
-                this._iframePromise = setupIFrame();
+                this._iframePromise = setupIFrame(this._unsafe);
             }
         }
         return this._iframePromise;
     }
 }
 
-const setupIFrame = (): Promise<HTMLIFrameElement> => new Promise((resolve, reject) => {
+/**
+ * Options for the {@link BrowserSandbox} constructor
+ * @public
+ */
+export interface BrowserSandboxOptions {
+    /**
+     * Controls whether the browser sandbox shall be unsafe, meaning that it is not run in
+     * a sandboxed iframe element. DO NOT set this property to `true` unless you're in a
+     * testing environment that doesn't support sandboxed iframes.
+     */
+    unsafe?: boolean;
+}
+
+const setupIFrame = (unsafe: boolean): Promise<HTMLIFrameElement> => new Promise((resolve, reject) => {
     try {
         const iframe = document.createElement("iframe");
         iframe.style.display = "none";
-        iframe.sandbox.add("allow-scripts");
-        iframe.srcdoc = `
-            <html><head><script>\n
-            ${IFRAME_CODE}\n
-            scripthostIFrame.setupIFrame();\n
-            </script></head></html>
-        `;
-        document.body.appendChild(iframe);
+        if (unsafe) {
+            document.body.appendChild(iframe);
+            const { contentDocument } = iframe;
+            if (contentDocument === null) {
+                throw new Error("Unsafe browser sandbox IFRAME element does not expose content document");
+            }
+            const script = contentDocument.createElement("script");
+            script.text = IFRAME_CODE;
+            contentDocument.body.appendChild(script);
+        } else {
+            iframe.sandbox.add("allow-scripts");
+            iframe.srcdoc = IFRAME_HTML;
+            document.body.appendChild(iframe);
+        }
         const timeoutId = setTimeout(
             () => reject(new Error("Browser sandbox IFRAME element did not load")),
             3000
@@ -107,3 +129,6 @@ const setupIFrame = (): Promise<HTMLIFrameElement> => new Promise((resolve, reje
         reject(err);
     }
 });
+
+const IFRAME_CODE = `\n${IFRAME_LIB}\nscripthostIFrame.setupIFrame();\n`;
+const IFRAME_HTML = `<html><head><script>${IFRAME_CODE}</script></head></html>`;

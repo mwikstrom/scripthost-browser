@@ -17,7 +17,7 @@ export declare class BrowserSandbox implements ScriptSandbox
 
 |  Constructor | Modifiers | Description |
 |  --- | --- | --- |
-|  [(constructor)()](./scripthost-browser.browsersandbox._constructor_.md) |  | Constructs a new instance of the <code>BrowserSandbox</code> class |
+|  [(constructor)(options)](./scripthost-browser.browsersandbox._constructor_.md) |  | Constructs a new instance of the <code>BrowserSandbox</code> class |
 
 ## Methods
 

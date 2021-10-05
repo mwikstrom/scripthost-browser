@@ -9,7 +9,7 @@ import { ScriptValue } from 'scripthost-core';
 
 // @public
 export class BrowserSandbox implements ScriptSandbox {
-    constructor();
+    constructor(options?: BrowserSandboxOptions);
     // (undocumented)
     dispose(): Promise<void>;
     // (undocumented)
@@ -18,6 +18,11 @@ export class BrowserSandbox implements ScriptSandbox {
     post(message: ScriptValue): void;
     // (undocumented)
     ready(): Promise<void>;
+}
+
+// @public
+export interface BrowserSandboxOptions {
+    unsafe?: boolean;
 }
 
 ```

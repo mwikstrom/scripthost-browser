@@ -9,5 +9,12 @@ Constructs a new instance of the `BrowserSandbox` class
 <b>Signature:</b>
 
 ```typescript
-constructor();
+constructor(options?: BrowserSandboxOptions);
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  options | [BrowserSandboxOptions](./scripthost-browser.browsersandboxoptions.md) |  |
+

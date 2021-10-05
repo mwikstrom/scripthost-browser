@@ -12,3 +12,9 @@ Sandboxed and observable Javascript host that runs inside an iframe element
 |  --- | --- |
 |  [BrowserSandbox](./scripthost-browser.browsersandbox.md) | A script host brigde that runs code inside an IFRAME element |
 
+## Interfaces
+
+|  Interface | Description |
+|  --- | --- |
+|  [BrowserSandboxOptions](./scripthost-browser.browsersandboxoptions.md) | Options for the [BrowserSandbox](./scripthost-browser.browsersandbox.md) constructor |
+
