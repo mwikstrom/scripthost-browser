@@ -112,19 +112,20 @@ const setupIFrame = (unsafe: boolean): Promise<HTMLIFrameElement> => new Promise
             const script = contentDocument.createElement("script");
             script.text = IFRAME_CODE;
             contentDocument.body.appendChild(script);
+            resolve(iframe);
         } else {
             iframe.sandbox.add("allow-scripts");
             iframe.srcdoc = IFRAME_HTML;
             document.body.appendChild(iframe);
+            const timeoutId = setTimeout(
+                () => reject(new Error("Browser sandbox IFRAME element did not load")),
+                3000
+            );
+            iframe.addEventListener("load", () => {
+                clearTimeout(timeoutId);
+                resolve(iframe);
+            });
         }
-        const timeoutId = setTimeout(
-            () => reject(new Error("Browser sandbox IFRAME element did not load")),
-            3000
-        );
-        iframe.addEventListener("load", () => {
-            clearTimeout(timeoutId);
-            resolve(iframe);
-        });
     } catch (err) {
         reject(err);
     }
