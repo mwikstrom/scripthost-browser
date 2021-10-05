@@ -48,7 +48,7 @@ export class BrowserSandbox implements ScriptSandbox {
         this._getIFrame().then(
             ({contentWindow}) => active && window.addEventListener("message", listener = (e: MessageEvent): void => {
                 const { origin, source, data } = e;
-                if (origin !== "null") {
+                if (origin !== "null" && !this._unsafe) {
                     console.warn(`Browser sandbox: Rejecting message with invalid origin: ${origin}`);
                 } else if (!source) {
                     console.warn("Browser sandbox: Rejecting message without source");
