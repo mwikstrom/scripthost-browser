@@ -48,18 +48,16 @@ export class BrowserSandbox implements ScriptSandbox {
         this._getIFrame().then(
             ({contentWindow}) => active && window.addEventListener("message", listener = (e: MessageEvent): void => {
                 const { origin, source, data } = e;
-                if (origin !== "null" && !this._unsafe) {
-                    console.warn(`Browser sandbox: Rejecting message with invalid origin: ${origin}`);
-                } else if (!source) {
-                    console.warn("Browser sandbox: Rejecting message without source");
-                } else if (source !== contentWindow) {
-                    console.warn("Browser sandbox: Rejecting message with invalid source");
-                } else {
-                    try {
-                        handler(data);
-                    } catch (error) {
-                        console.error("Browser sandbox: Listener threw exception:", error);
-                    }
+                const rejectMessage = this._getRejectMessage(origin, source, contentWindow);
+
+                if (rejectMessage !== null) {
+                    console.warn(`Browser sandbox: Rejecting message: ${rejectMessage}`);
+                }
+                
+                try {
+                    handler(data);
+                } catch (error) {
+                    console.error("Browser sandbox: Listener threw exception:", error);
                 }
             }),
             error => console.error("Browser sandbox is not available:", error),
@@ -70,6 +68,30 @@ export class BrowserSandbox implements ScriptSandbox {
                 window.removeEventListener("message", listener);
             }
         };
+    }
+
+    private _getRejectMessage(
+        origin: string, 
+        source: MessageEventSource | null, 
+        contentWindow: Window | null
+    ): string | null {
+        if (this._unsafe) {
+            return null;
+        }
+
+        if (origin !== "null") {
+            return `Invalid origin: ${origin}`;
+        }
+
+        if (!source) {
+            return "No source";
+        }
+
+        if (source !== contentWindow) {
+            return "Invalid source";
+        }
+
+        return null;
     }
 
     private _getIFrame(): Promise<HTMLIFrameElement> {
