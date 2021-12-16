@@ -1,14 +1,13 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import pluginTypescript from "@rollup/plugin-typescript";
 import pluginCommonjs from "@rollup/plugin-commonjs";
 import pluginNodeResolve from "@rollup/plugin-node-resolve";
 import { babel } from "@rollup/plugin-babel";
 import { string } from "rollup-plugin-string";
-import * as path from "path";
 import pkg from "./package.json";
 
-const moduleName = pkg.name.replace(/^@.*\//, "");
 const inputFileName = "src/index.ts";
-const banner = `// ${moduleName} - version ${pkg.version}`;
+const banner = `// ${pkg.name} - version ${pkg.version}`;
 
 export default [
     {
@@ -19,12 +18,19 @@ export default [
                 format: "cjs",
                 sourcemap: true,
                 banner,
-                exports: "named",
             },
         ],
-        external: [
-            ...Object.keys(pkg.peerDependencies || {}),
-        ],
+        external: id => {
+            if (id.includes("scripthost-iframe")) {
+                return false;
+            } else {
+                return (
+                    !(id in (pkg.dependencies || {})) && 
+                    !/(src|node_modules)/.test(id) && 
+                    !/^\.+/.test(id)
+                );
+            }
+        },
         plugins: [
             string({
                 include: "node_modules/scripthost-iframe/dist/scripthost-iframe.js"
@@ -37,8 +43,8 @@ export default [
                 extensions: [".js", ".ts"],
             }),
             babel({
-                babelHelpers: "bundled",
-                configFile: path.resolve(__dirname, ".babelrc"),
+                babelHelpers: "runtime",
+                extensions: [ ".ts", ".tsx" ],
             }),
             pluginNodeResolve({
                 browser: false,
