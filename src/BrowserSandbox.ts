@@ -88,7 +88,7 @@ export class BrowserSandbox implements ScriptSandbox {
             return "Unbound window";
         }
 
-        if (source !== contentWindow && source !== contentWindow.top) {
+        if (!("top" in source) || source.top !== contentWindow.top) {
             return "Invalid source";
         }
 
