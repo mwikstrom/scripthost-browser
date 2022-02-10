@@ -80,10 +80,6 @@ export class BrowserSandbox implements ScriptSandbox {
             return null;
         }
 
-        if (origin !== window.origin) {
-            return `Invalid origin: ${origin}`;
-        }
-
         if (!source) {
             return "No source";
         }
@@ -94,6 +90,10 @@ export class BrowserSandbox implements ScriptSandbox {
 
         if (source !== contentWindow && source !== contentWindow.top) {
             return "Invalid source";
+        }
+
+        if (origin !== window.origin && origin !== "null") {
+            return `Invalid origin: ${origin}`;
         }
 
         return null;
