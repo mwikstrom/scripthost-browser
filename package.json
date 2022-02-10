@@ -1,6 +1,6 @@
 {
   "name": "scripthost-browser",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Sandboxed and observable Javascript host that runs inside an iframe element",
   "main": "./dist/scripthost-browser.js",
   "typings": "./dist/scripthost-browser.d.ts",
