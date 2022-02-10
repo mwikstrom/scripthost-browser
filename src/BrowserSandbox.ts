@@ -74,7 +74,7 @@ export class BrowserSandbox implements ScriptSandbox {
     private _getRejectMessage(
         origin: string, 
         source: MessageEventSource | null, 
-        contentWindow: Window | null
+        contentWindow: Window | null,
     ): string | null {
         if (this._unsafe) {
             return null;
@@ -88,7 +88,11 @@ export class BrowserSandbox implements ScriptSandbox {
             return "No source";
         }
 
-        if (source !== contentWindow && source !== contentWindow?.top) {
+        if (!contentWindow) {
+            return "Unbound window";
+        }
+
+        if (source !== contentWindow && source !== contentWindow.top) {
             return "Invalid source";
         }
 
