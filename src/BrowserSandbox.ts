@@ -52,6 +52,7 @@ export class BrowserSandbox implements ScriptSandbox {
 
                 if (rejectMessage !== null) {
                     console.warn(`Browser sandbox: Rejecting message: ${rejectMessage}`);
+                    return;
                 }
                 
                 try {
