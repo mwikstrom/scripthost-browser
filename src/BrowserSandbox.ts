@@ -1,4 +1,4 @@
-import { ScriptSandbox, ScriptValue } from "scripthost-core";
+import { isGenericMessage, ScriptSandbox, ScriptValue } from "scripthost-core";
 import IFRAME_LIB from "scripthost-iframe/dist/scripthost-iframe.js";
 
 /**
@@ -48,6 +48,12 @@ export class BrowserSandbox implements ScriptSandbox {
         this._getIFrame().then(
             ({contentWindow}) => active && window.addEventListener("message", listener = (e: MessageEvent): void => {
                 const { origin, source, data } = e;
+
+                // Silently ignore messages that can't be understood
+                if (!isGenericMessage(data)) {
+                    return;
+                }
+
                 const rejectMessage = this._getRejectMessage(origin, source, contentWindow);
 
                 if (rejectMessage !== null) {
