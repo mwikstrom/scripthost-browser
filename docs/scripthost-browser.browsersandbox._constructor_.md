@@ -16,5 +16,5 @@ constructor(options?: BrowserSandboxOptions);
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  options | [BrowserSandboxOptions](./scripthost-browser.browsersandboxoptions.md) |  |
+|  options | [BrowserSandboxOptions](./scripthost-browser.browsersandboxoptions.md) | <i>(Optional)</i> |
 
