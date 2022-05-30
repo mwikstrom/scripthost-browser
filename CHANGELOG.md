@@ -1,3 +1,7 @@
+## 1.0.1 - 2022-05-30
+
+- Fix: Don't log "sandbox not available" after disposal
+
 ## 1.0.0 - 2022-05-04
 
 The first non-preview/development release.

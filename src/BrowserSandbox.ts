@@ -38,7 +38,7 @@ export class BrowserSandbox implements ScriptSandbox {
                     console.error("Cannot post message to browser sandbox, because it does not have a content window");
                 }
             },
-            error => console.error("Browser sandbox is not available:", error),
+            error => this._logNotAvailable(error),
         );
     }
     
@@ -67,7 +67,7 @@ export class BrowserSandbox implements ScriptSandbox {
                     console.error("Browser sandbox: Listener threw exception:", error);
                 }
             }),
-            error => console.error("Browser sandbox is not available:", error),
+            error => this._logNotAvailable(error),
         );
         return () => {
             active = false;
@@ -116,6 +116,13 @@ export class BrowserSandbox implements ScriptSandbox {
             }
         }
         return this._iframePromise;
+    }
+
+    private _logNotAvailable(error: unknown): void {
+        // Don't log "not available"-error after disposal
+        if (!this._disposed) {
+            console.error("Browser sandbox is not available:", error);
+        }
     }
 }
 
