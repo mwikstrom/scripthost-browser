@@ -1,3 +1,7 @@
+## 1.0.2 - 2022-07-08
+
+- Upgrade `scripthost-iframe` to `1.1.0`
+
 ## 1.0.1 - 2022-05-30
 
 - Fix: Don't log "sandbox not available" after disposal

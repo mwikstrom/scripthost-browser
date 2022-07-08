@@ -69,7 +69,7 @@
     "rollup": "^2.71.1",
     "rollup-plugin-string": "^3.0.0",
     "scripthost-core": "^1.0.0",
-    "scripthost-iframe": "^1.0.0",
+    "scripthost-iframe": "^1.1.0",
     "ts-loader": "^9.3.0",
     "ts-node": "^10.7.0",
     "tslib": "^2.4.0",
