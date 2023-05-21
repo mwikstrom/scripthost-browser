@@ -1,3 +1,7 @@
+## 1.1.0 - 2023-05-22
+
+- New feature: Read-only globals
+
 ## 1.0.2 - 2022-07-08
 
 - Upgrade `scripthost-iframe` to `1.1.0`
