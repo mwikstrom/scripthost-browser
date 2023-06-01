@@ -18,7 +18,7 @@ describe("BrowserSandbox", () => {
     });
 
     it("can evaluate basic expression", async () => {
-        const sandbox = new BrowserSandbox({ unsafe: true });
+        const sandbox = new BrowserSandbox({ unsafe: true, messageIdPrefix: "sandbox-" });
         const output = new Promise(resolve => sandbox.listen(resolve));
         sandbox.post({
             type: "eval",
@@ -36,7 +36,7 @@ describe("BrowserSandbox", () => {
     });
 
     it("can evaluate basic expression", async () => {
-        const sandbox = new BrowserSandbox({ unsafe: true });
+        const sandbox = new BrowserSandbox({ unsafe: true, messageIdPrefix: "sandbox-" });
         const output = new Promise(resolve => sandbox.listen(resolve));
         sandbox.post({
             type: "eval",

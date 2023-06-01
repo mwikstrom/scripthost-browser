@@ -1,3 +1,5 @@
+import { Parameters } from "enzyme";
+import { nanoid } from "nanoid";
 import { isGenericMessage, ScriptSandbox, ScriptValue } from "scripthost-core";
 import IFRAME_LIB from "scripthost-iframe/dist/scripthost-iframe.js";
 
@@ -6,12 +8,14 @@ import IFRAME_LIB from "scripthost-iframe/dist/scripthost-iframe.js";
  * @public
  */
 export class BrowserSandbox implements ScriptSandbox {
+    private readonly _messageIdPrefix: string;
     private readonly _unsafe: boolean;
     private _iframePromise: Promise<HTMLIFrameElement> | null;
     private _disposed;
 
     constructor(options: BrowserSandboxOptions = {}) {
-        const { unsafe = false } = options;
+        const { unsafe = false, messageIdPrefix = `sandbox-${nanoid()}-` } = options;
+        this._messageIdPrefix = messageIdPrefix;
         this._unsafe = unsafe;
         this._iframePromise = null;
         this._disposed = false;
@@ -51,6 +55,11 @@ export class BrowserSandbox implements ScriptSandbox {
 
                 // Silently ignore messages that can't be understood
                 if (!isGenericMessage(data)) {
+                    return;
+                }
+
+                // Silently ignore messages that don't have the expected prefix
+                if (!data.messageId.startsWith(this._messageIdPrefix)) {
                     return;
                 }
 
@@ -112,7 +121,7 @@ export class BrowserSandbox implements ScriptSandbox {
                     "Browser sandbox is disposed"
                 )));
             } else {
-                this._iframePromise = setupIFrame(this._unsafe);
+                this._iframePromise = setupIFrame(this._unsafe, this._messageIdPrefix);
             }
         }
         return this._iframePromise;
@@ -137,9 +146,14 @@ export interface BrowserSandboxOptions {
      * testing environment that doesn't support sandboxed iframes.
      */
     unsafe?: boolean;
+
+    messageIdPrefix?: string;
 }
 
-const setupIFrame = (unsafe: boolean): Promise<HTMLIFrameElement> => new Promise((resolve, reject) => {
+const setupIFrame = (
+    unsafe: boolean,
+    messageIdPrefix: string | undefined
+): Promise<HTMLIFrameElement> => new Promise((resolve, reject) => {
     try {
         const iframe = document.createElement("iframe");
         iframe.style.display = "none";
@@ -150,12 +164,12 @@ const setupIFrame = (unsafe: boolean): Promise<HTMLIFrameElement> => new Promise
                 throw new Error("Unsafe browser sandbox IFRAME element does not expose content document");
             }
             const script = contentDocument.createElement("script");
-            script.text = IFRAME_CODE;
+            script.text = makeIFrameCode(messageIdPrefix);
             contentDocument.body.appendChild(script);
             resolve(iframe);
         } else {
             iframe.sandbox.add("allow-scripts");
-            iframe.srcdoc = IFRAME_HTML;
+            iframe.srcdoc = makeIFrameHtml(messageIdPrefix);
             document.body.appendChild(iframe);
             const timeoutId = setTimeout(
                 () => reject(new Error("Browser sandbox IFRAME element did not load")),
@@ -171,5 +185,12 @@ const setupIFrame = (unsafe: boolean): Promise<HTMLIFrameElement> => new Promise
     }
 });
 
-const IFRAME_CODE = `\n${IFRAME_LIB}\nscripthostIFrame.setupIFrame();\n`;
-const IFRAME_HTML = `<html><head><script>${IFRAME_CODE}</script></head></html>`;
+const makeIFrameCode = (messageIdPrefix?: string) => {
+    const formattedMessageIdPrefix = typeof messageIdPrefix === "string"
+        ? JSON.stringify(messageIdPrefix)
+        : "undefined";
+    return `\n${IFRAME_LIB}\nscripthostIFrame.setupIFrame(window, ${formattedMessageIdPrefix});\n`;
+};
+
+const makeIFrameHtml = (...args: Parameters<typeof makeIFrameCode>) =>
+    `<html><head><script>${makeIFrameCode(...args)}</script></head></html>`;

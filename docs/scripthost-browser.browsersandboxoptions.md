@@ -16,5 +16,6 @@ export interface BrowserSandboxOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
+|  [messageIdPrefix?](./scripthost-browser.browsersandboxoptions.messageidprefix.md) | string | <i>(Optional)</i> |
 |  [unsafe?](./scripthost-browser.browsersandboxoptions.unsafe.md) | boolean | <i>(Optional)</i> Controls whether the browser sandbox shall be unsafe, meaning that it is not run in a sandboxed iframe element. DO NOT set this property to <code>true</code> unless you're in a testing environment that doesn't support sandboxed iframes. |
 

@@ -22,6 +22,8 @@ export class BrowserSandbox implements ScriptSandbox {
 
 // @public
 export interface BrowserSandboxOptions {
+    // (undocumented)
+    messageIdPrefix?: string;
     unsafe?: boolean;
 }
 
